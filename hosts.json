@@ -4,7 +4,7 @@
         "name": "Me"
     },
     {
-        "ip": "rancher-server",
+        "ip": "192.168.1.10",
         "name": "rancher-server"
     },
     {
