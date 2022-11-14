@@ -1,0 +1,14 @@
+[
+    {
+        "ip": "127.0.0.1",
+        "name": "Me"
+    },
+    {
+        "ip": "rancher-server",
+        "name": "rancher-server"
+    },
+    {
+        "ip": "10.0.0.10",
+        "name": "not-exist"
+    }
+]
