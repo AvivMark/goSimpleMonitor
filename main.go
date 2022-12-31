@@ -5,18 +5,23 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/go-ping/ping"
 )
 
 type Host struct {
-	IP   string `json:"ip"`
-	Name string `json:"name"`
+	ID       string `json:"ID"`       // ID
+	Hostname string `json:"Hostname"` // HOSTNAME
+	HostIP   string `json:"HostIP"`   // HOST IP
+	IsAlive  bool   `json:"isAlive"`  // say if there is connection to this host
 }
 
+var urlGetHosts string = "http://localhost:5000/hosts"
+
 func main() {
-	hosts := loadHosts("./hosts.json")
+	hosts := loadHostsAPI(urlGetHosts)
 	ips := getIps(hosts)
 
 	startMonitor(ips)
@@ -37,7 +42,7 @@ func testLoad(p string) {
 
 }
 
-func loadHosts(p string) (hosts []Host) {
+func loadHostsJson(p string) (hosts []Host) {
 	content, err := ioutil.ReadFile(p)
 
 	if err != nil {
@@ -53,18 +58,37 @@ func loadHosts(p string) (hosts []Host) {
 	return *tmp
 }
 
+func loadHostsAPI(url string) (hosts []Host) {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var tmp *[]Host
+	err = json.Unmarshal(body, &tmp)
+	if err != nil {
+		log.Fatal("Error during Unmarshal(): ", err)
+	}
+
+	return *tmp
+}
+
 func getIps(hl []Host) []string {
 	ips := make([]string, 0)
 	for _, host := range hl {
-		ips = append(ips, host.IP)
+		ips = append(ips, host.HostIP)
 		fmt.Println(ips)
 	}
 	return ips
 }
 
 func printHost(h Host) {
-	fmt.Println(h.IP)
-	fmt.Println(h.Name)
+	fmt.Println(h.HostIP)
+	fmt.Println(h.Hostname)
 }
 
 func startMonitor(ips []string) {
